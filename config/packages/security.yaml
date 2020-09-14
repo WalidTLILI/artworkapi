@@ -1,0 +1,42 @@
+security:
+  # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+  role_hierarchy:
+    ROLE_ADMIN:       ROLE_USER
+    ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+
+  encoders:
+    # use your user class name here
+    App\Entity\User:
+      # bcrypt or argon2i are recommended
+      # argon2i is more secure, but requires PHP 7.2 or the Sodium extension
+      algorithm: argon2i
+      cost: 12
+
+  providers:
+    users_in_memory: { memory: null }
+    orm:
+      entity:
+        class: App\Entity\User
+        property: email
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+
+    api:
+      pattern: ^/api/
+      anonymous: true
+      stateless: true
+      provider: orm
+
+      # activate different ways to authenticate
+      # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+      # https://symfony.com/doc/current/security/impersonating_user.html
+      # switch_user: true
+
+  # Easy way to control access for large sections of your site
+  # Note: Only the *first* access control that matches will be used
+  access_control:
+    - { path: ^/api,   roles: IS_AUTHENTICATED_ANONYMOUSLY }

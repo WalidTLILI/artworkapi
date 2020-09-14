@@ -1,0 +1,44 @@
+api_platform:
+  mapping:
+    paths:
+      - '%kernel.project_dir%/config/api_platform/resources.yaml'
+      - '%kernel.project_dir%/src/Entity'
+  patch_formats:
+    json: ['application/merge-patch+json']
+
+  title: artworkAPI
+  version: 0.0.2
+
+  collection:
+
+    order: 'ASC'
+    order_parameter_name: order
+
+    pagination:
+
+      enabled: true
+      page_parameter_name: page
+
+      client_enabled: true
+      enabled_parameter_name: pagination # optional
+
+      client_items_per_page: true # Disabled by default
+      items_per_page_parameter_name: itemsPerPage # Default value
+      items_per_page: 100
+
+  formats:
+    jsonld:   ['application/ld+json']
+    jsonhal:  ['application/hal+json']
+    jsonapi:  ['application/vnd.api+json']
+    json:     ['application/json']
+    xml:      ['application/xml', 'text/xml']
+    yaml:     ['application/x-yaml']
+    csv:      ['text/csv']
+    html:     ['text/html']
+
+  swagger:
+    versions: [3]
+    api_keys: # Add a JWT-based authentication to your API
+      apiKey:
+        name: Authorization
+        type: header

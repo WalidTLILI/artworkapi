@@ -1,0 +1,49 @@
+# docker-compose.yml
+version: '3.7'
+
+services:
+  php-fpm:
+    build:
+      context: ./docker/php-fpm
+    container_name: ${APP_NAME}_${PHP_CONTAINER_NAME}
+#    restart: on-failure
+    depends_on:
+      - mysql
+    environment:
+      - APP_ENV=${APP_ENV}
+      - APP_SECRET=${APP_SECRET}
+      - DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@mysql:3306/${DATABASE_NAME}?serverVersion=5.7
+    volumes:
+      - .:/var/www/html
+
+  nginx:
+    image: nginx:alpine
+    container_name: ${APP_NAME}_${NGINX_CONTAINER_NAME}
+#    restart: always
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/sites/:/etc/nginx/sites-available
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+      - ./docker/nginx/logs:/var/log/nginx
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - php-fpm
+      - mysql
+    command: "nginx"
+
+  mysql:
+    image: mysql:5.7
+    container_name: ${APP_NAME}_${MYSQL_CONTAINER_NAME}
+#    restart: on-failure
+    environment:
+      - MYSQL_DATABASE=${DATABASE_NAME}
+      - MYSQL_USER=${DATABASE_USER}
+      - MYSQL_PASSWORD=${DATABASE_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
+    ports:
+      - 3306:3306
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
